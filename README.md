@@ -154,7 +154,7 @@ sk-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
 
 ```
 [*] 共 512 个 API Key
-[*] 目标验证节点: https://new.timefiles.online/v1/models
+[*] 目标验证节点: https://api.openai.com/v1
 [*] 检测模型: gpt-3.5-turbo
 [*] 开始多线程并发检测...
 
