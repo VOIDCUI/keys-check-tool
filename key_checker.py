@@ -115,7 +115,7 @@ class KeyChecker:
         if self.valid_keys:
             print("\n有效的 Keys:")
             for key in self.valid_keys:
-                print(f"  {self.mask_key(key)}")
+                print(f"  {key}")
 
         if self.invalid_keys:
             print("\n无效的 Keys (前10个):")
