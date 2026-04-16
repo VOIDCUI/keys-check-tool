@@ -8,8 +8,11 @@
 - ✅ 多线程并发检测，速度快
 - ✅ 支持 .env 配置文件和命令行参数
 - ✅ 支持自定义 Base URL 和模型
+- ✅ 默认读取 `keys.txt`，无需每次指定文件
+- ✅ 找到有效 Key 后可选择是否继续检测
 - ✅ Key 脱敏显示，保护隐私
 - ✅ 自动保存有效的 Keys 到文件
+- ✅ 实时进度条显示检测进度
 
 ## 快速开始
 
@@ -45,8 +48,16 @@ sk-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 ### 4. 运行检测
 
+最简单的方式（使用默认的 `keys.txt` 文件）:
+
 ```bash
-python key_checker.py -f keys.txt
+python key_checker.py
+```
+
+或指定其他文件:
+
+```bash
+python key_checker.py -f my_keys.txt
 ```
 
 ## 使用方法
@@ -61,23 +72,29 @@ python key_checker.py -f keys.txt
 
 ### 基本用法
 
-使用 `.env` 配置（推荐）:
+使用 `.env` 配置 + 默认 `keys.txt` 文件（推荐）:
 
 ```bash
-python key_checker.py -f keys.txt
+python key_checker.py
 ```
 
-使用命令行参数:
+指定其他 Keys 文件:
 
 ```bash
-python key_checker.py -f keys.txt -u https://api.openai.com/v1 -m gpt-3.5-turbo
+python key_checker.py -f my_keys.txt
+```
+
+使用命令行参数覆盖配置:
+
+```bash
+python key_checker.py -u https://api.openai.com/v1 -m gpt-3.5-turbo
 ```
 
 ### 完整参数说明
 
 ```bash
 python key_checker.py \
-  -f keys.txt \                          # Keys 文件路径（必需）
+  -f keys.txt \                          # Keys 文件路径（可选，默认 keys.txt）
   -u https://api.openai.com/v1 \         # API Base URL（可选，优先使用 .env）
   -m gpt-3.5-turbo \                     # 模型名称（可选，优先使用 .env）
   -w 10 \                                # 并发线程数（可选，默认 10）
@@ -93,8 +110,8 @@ python key_checker.py \
 BASE_URL=https://api.openai.com/v1
 MODEL=gpt-4
 
-# 运行
-python key_checker.py -f keys.txt
+# 运行（自动读取 keys.txt）
+python key_checker.py
 ```
 
 检测 Claude Keys:
@@ -104,13 +121,18 @@ BASE_URL=https://api.anthropic.com/v1
 MODEL=claude-opus-4-6
 
 # 运行
-python key_checker.py -f keys.txt
+python key_checker.py
 ```
 
 检测自定义 API:
 ```bash
 # 使用命令行参数覆盖 .env 配置
-python key_checker.py -f keys.txt -u https://custom-api.com/v1 -m custom-model
+python key_checker.py -u https://custom-api.com/v1 -m custom-model
+```
+
+指定其他 Keys 文件:
+```bash
+python key_checker.py -f other_keys.txt
 ```
 
 ## Keys 文件格式

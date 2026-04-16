@@ -142,7 +142,7 @@ def main():
     load_dotenv()
 
     parser = argparse.ArgumentParser(description='API Key 批量检测工具')
-    parser.add_argument('-f', '--file', required=True, help='包含 API Keys 的文件路径 (每行一个)')
+    parser.add_argument('-f', '--file', default='keys.txt', help='包含 API Keys 的文件路径 (默认: keys.txt)')
     parser.add_argument('-u', '--url', help='API Base URL (例如: https://api.openai.com/v1)')
     parser.add_argument('-m', '--model', help='要检测的模型名称')
     parser.add_argument('-w', '--workers', type=int, default=10, help='并发线程数 (默认: 10)')
