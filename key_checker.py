@@ -11,6 +11,8 @@ from typing import List, Tuple
 import time
 import os
 from dotenv import load_dotenv
+from tqdm import tqdm
+import sys
 
 
 class KeyChecker:
@@ -20,6 +22,7 @@ class KeyChecker:
         self.timeout = timeout
         self.valid_keys = []
         self.invalid_keys = []
+        self.stop_checking = False
 
     def check_single_key(self, api_key: str) -> Tuple[str, bool, str]:
         """检测单个 API Key 是否可用"""
@@ -61,16 +64,37 @@ class KeyChecker:
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {executor.submit(self.check_single_key, key): key for key in keys}
 
-            for future in concurrent.futures.as_completed(futures):
-                api_key, is_valid, message = future.result()
+            # 使用 tqdm 创建进度条
+            with tqdm(total=len(keys), desc="检测进度", unit="key") as pbar:
+                for future in concurrent.futures.as_completed(futures):
+                    if self.stop_checking:
+                        # 取消剩余的任务
+                        for f in futures:
+                            f.cancel()
+                        break
 
-                if is_valid:
-                    self.valid_keys.append(api_key)
-                    # 脱敏显示
-                    masked_key = self.mask_key(api_key)
-                    print(f"[+] 成功! 找到有效的 API Key: {masked_key}")
-                else:
-                    self.invalid_keys.append((api_key, message))
+                    api_key, is_valid, message = future.result()
+
+                    if is_valid:
+                        self.valid_keys.append(api_key)
+                        # 不脱敏,显示完整 Key
+                        tqdm.write(f"\n[+] 成功! 找到有效的 API Key: {api_key}")
+
+                        # 询问是否继续检测
+                        pbar.close()
+                        user_input = input("\n是否继续检测剩余的 Keys? (y/n): ").strip().lower()
+                        if user_input != 'y':
+                            self.stop_checking = True
+                            print("[*] 停止检测...")
+                            break
+                        else:
+                            # 重新创建进度条
+                            remaining = len(keys) - pbar.n
+                            pbar = tqdm(total=len(keys), desc="检测进度", unit="key", initial=pbar.n)
+                    else:
+                        self.invalid_keys.append((api_key, message))
+
+                    pbar.update(1)
 
         self.print_summary()
 
