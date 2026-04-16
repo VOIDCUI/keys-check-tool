@@ -5,6 +5,7 @@
 keys.txt
 *_keys.txt
 valid_keys.txt
+valid_keys/
 
 # Python
 __pycache__/

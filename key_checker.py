@@ -13,6 +13,7 @@ import os
 from dotenv import load_dotenv
 from tqdm import tqdm
 import sys
+from datetime import datetime
 
 
 class KeyChecker:
@@ -61,7 +62,8 @@ class KeyChecker:
         print(f"[*] 检测模型: {self.model}")
         print(f"[*] 开始多线程并发检测...\n")
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+        try:
             futures = {executor.submit(self.check_single_key, key): key for key in keys}
 
             # 使用 tqdm 创建进度条
@@ -86,6 +88,8 @@ class KeyChecker:
                         if user_input != 'y':
                             self.stop_checking = True
                             print("[*] 停止检测...")
+                            # 强制停止线程池
+                            executor.shutdown(wait=False, cancel_futures=True)
                             break
                         else:
                             # 重新创建进度条
@@ -95,6 +99,8 @@ class KeyChecker:
                         self.invalid_keys.append((api_key, message))
 
                     pbar.update(1)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
         self.print_summary()
 
@@ -146,7 +152,7 @@ def main():
     parser.add_argument('-u', '--url', help='API Base URL (例如: https://api.openai.com/v1)')
     parser.add_argument('-m', '--model', help='要检测的模型名称')
     parser.add_argument('-w', '--workers', type=int, default=10, help='并发线程数 (默认: 10)')
-    parser.add_argument('-o', '--output', default='valid_keys.txt', help='输出文件路径 (默认: valid_keys.txt)')
+    parser.add_argument('-o', '--output', help='输出文件路径 (默认: valid_keys/valid_keys_YYYYMMDD_HHMMSS.txt)')
     parser.add_argument('-t', '--timeout', type=int, default=10, help='请求超时时间/秒 (默认: 10)')
 
     args = parser.parse_args()
@@ -176,7 +182,16 @@ def main():
 
     # 保存结果
     if checker.valid_keys:
-        checker.save_results(args.output)
+        # 如果没有指定输出文件，使用带时间戳的默认文件名并保存到 valid_keys 文件夹
+        output_file = args.output
+        if not output_file:
+            # 创建 valid_keys 文件夹（如果不存在）
+            keys_dir = 'valid_keys'
+            os.makedirs(keys_dir, exist_ok=True)
+
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            output_file = os.path.join(keys_dir, f'valid_keys_{timestamp}.txt')
+        checker.save_results(output_file)
 
 
 if __name__ == "__main__":

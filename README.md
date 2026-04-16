@@ -98,7 +98,7 @@ python key_checker.py \
   -u https://api.openai.com/v1 \         # API Base URL（可选，优先使用 .env）
   -m gpt-3.5-turbo \                     # 模型名称（可选，优先使用 .env）
   -w 10 \                                # 并发线程数（可选，默认 10）
-  -o valid_keys.txt \                    # 输出文件（可选，默认 valid_keys.txt）
+  -o valid_keys/my_keys.txt \            # 输出文件（可选，默认 valid_keys/valid_keys_YYYYMMDD_HHMMSS.txt）
   -t 10                                  # 超时时间/秒（可选，默认 10）
 ```
 
@@ -160,14 +160,19 @@ sk-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
 
 [+] 成功! 找到有效的 API Key: sk-2L...xzE2g
 
+是否继续检测剩余的 Keys? (y/n): n
+[*] 停止检测...
+
 ============================================================
 检测完成!
 有效 Key 数量: 1
 无效 Key 数量: 511
 ============================================================
 
-[*] 有效的 Keys 已保存到: valid_keys.txt
+[*] 有效的 Keys 已保存到: valid_keys/valid_keys_20260416_143052.txt
 ```
+
+所有有效的 Keys 会自动保存到 `valid_keys/` 文件夹中，文件名包含时间戳，不会相互覆盖。
 
 ## 安全提示
 
@@ -176,7 +181,7 @@ sk-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
 本项目已配置 `.gitignore` 来防止敏感文件被提交:
 - `.env` - 你的 API 配置
 - `keys.txt` - 待检测的 Keys
-- `valid_keys.txt` - 检测结果
+- `valid_keys/` - 所有检测结果文件夹
 - `*_keys.txt` - 所有包含 keys 的文件
 
 ## 注意事项
